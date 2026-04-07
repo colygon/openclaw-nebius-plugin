@@ -1,6 +1,19 @@
 # Nebius Token Factory Provider Plugin for OpenClaw
 
-A provider plugin that gives OpenClaw access to 44+ open-source models via Nebius's OpenAI-compatible inference API — including Qwen, DeepSeek, GLM, Llama, Gemma, FLUX, and more.
+A provider plugin that gives OpenClaw access to 44+ open-source models via Nebius's OpenAI-compatible inference API.
+
+---
+
+> **Model naming matters.** Always use the fully qualified name with the `nebius/` prefix:
+>
+> ```
+> nebius/zai-org/GLM-5          <-- correct
+> zai-org/GLM-5                 <-- WRONG: "Unknown model" error
+> ```
+>
+> The catalog registers model IDs like `zai-org/GLM-5`. OpenClaw automatically
+> prepends the provider prefix, so users and config files must always write
+> `nebius/zai-org/GLM-5`.
 
 ---
 
@@ -13,19 +26,17 @@ A provider plugin that gives OpenClaw access to 44+ open-source models via Nebiu
 
 ## Installation
 
-### 1. Set the API key for the gateway
+### 1. Set the API key
 
-The OpenClaw gateway runs as a macOS LaunchAgent. Shell env vars from `.zshrc`/`.bashrc` are **not** visible to it. Use `launchctl`:
+**Auth profiles and env vars are the source of truth for authentication.**
+The plugin manifest does NOT accept an `apiKey` in its config — it resolves
+credentials through OpenClaw's provider auth system.
 
-```bash
-launchctl setenv NEBIUS_API_KEY "v1.YOUR_KEY_HERE"
-```
+There are two ways to provide the key (use both for reliability):
 
-### 2. Add the auth profile
+**a) Auth profile** (required for the agent):
 
-Edit `~/.openclaw/agents/main/agent/auth-profiles.json`.
-
-Add `"nebius:default"` inside `"profiles"`:
+Edit `~/.openclaw/agents/main/agent/auth-profiles.json` and add inside `"profiles"`:
 
 ```json
 "nebius:default": {
@@ -35,46 +46,29 @@ Add `"nebius:default"` inside `"profiles"`:
 }
 ```
 
-Add `"nebius"` inside `"lastGood"`:
+And inside `"lastGood"`:
 
 ```json
 "nebius": "nebius:default"
 ```
 
-Full example:
+**b) Environment variable** (required for the gateway LaunchAgent):
 
-```json
-{
-  "version": 1,
-  "profiles": {
-    "openai:default": {
-      "type": "api_key",
-      "provider": "openai",
-      "key": "sk-proj-..."
-    },
-    "nebius:default": {
-      "type": "api_key",
-      "provider": "nebius",
-      "key": "v1.YOUR_KEY_HERE"
-    }
-  },
-  "lastGood": {
-    "openai": "openai:default",
-    "nebius": "nebius:default"
-  }
-}
+The gateway runs as a macOS LaunchAgent. Shell env vars (`.zshrc`) are NOT
+visible to it. You must use `launchctl`:
+
+```bash
+launchctl setenv NEBIUS_API_KEY "v1.YOUR_KEY_HERE"
 ```
 
-### 3. Enable the plugin
+### 2. Enable the plugin
 
-Edit `~/.openclaw/openclaw.json`.
+Edit `~/.openclaw/openclaw.json`:
 
 Under `plugins.entries`:
 
 ```json
-"nebius": {
-  "enabled": true
-}
+"nebius": { "enabled": true }
 ```
 
 Under `plugins.installs`:
@@ -82,22 +76,22 @@ Under `plugins.installs`:
 ```json
 "nebius": {
   "source": "path",
-  "installPath": "/Users/colinlowenberg/.openclaw/extensions/openclaw-nebius",
-  "version": "1.0.0"
+  "installPath": "/path/to/openclaw-nebius",
+  "version": "1.1.0"
 }
 ```
 
-### 4. Set Nebius as the default model (optional)
+### 3. Set as default model (optional)
 
 In `~/.openclaw/openclaw.json` under `agents.defaults.model`:
 
 ```json
 "model": {
-  "primary": "nebius/zai-org/GLM-5"
+  "primary": "nebius/Qwen/Qwen3.5-397B-A17B"
 }
 ```
 
-### 5. Restart
+### 4. Restart
 
 ```bash
 openclaw gateway restart
@@ -107,82 +101,76 @@ openclaw gateway restart
 
 ## Available Models
 
+### Chat / Reasoning
+
 | Model | Type | Input $/1M | Output $/1M |
 |-------|------|-----------|-------------|
-| `Qwen/Qwen3.5-397B-A17B` | Text | $0.60 | $3.60 |
-| `Qwen/Qwen3-Coder-480B-A35B-Instruct` | Text | $0.40 | $1.80 |
-| `Qwen/Qwen3-235B-A22B-Thinking-2507` | Reasoning | $0.20 | $0.80 |
-| `Qwen/Qwen3-235B-A22B-Instruct-2507` | Text | $0.20 | $0.60 |
-| `Qwen/Qwen3-Next-80B-A3B-Thinking` | Reasoning | $0.15 | $1.20 |
-| `Qwen/Qwen3-32B` | Text | $0.10 | $0.30 |
-| `Qwen/Qwen3-30B-A3B-Thinking-2507` | Reasoning | $0.10 | $0.30 |
-| `Qwen/Qwen3-30B-A3B-Instruct-2507` | Text | $0.10 | $0.30 |
-| `Qwen/Qwen3-Coder-30B-A3B-Instruct` | Text | $0.10 | $0.30 |
-| `Qwen/Qwen2.5-VL-72B-Instruct` | Text | $0.25 | $0.75 |
-| `Qwen/Qwen2.5-Coder-7B` | Text | $0.03 | $0.09 |
-| `deepseek-ai/DeepSeek-V3.2` | Text | $0.30 | $0.45 |
-| `deepseek-ai/DeepSeek-R1-0528` | Reasoning | $0.80 | $2.40 |
-| `deepseek-ai/DeepSeek-V3-0324` | Text | $0.50 | $1.50 |
-| `zai-org/GLM-5` | Text | $1.00 | $3.20 |
-| `zai-org/GLM-4.7` | Text | $0.40 | $2.00 |
-| `zai-org/GLM-4.5` | Text | $0.60 | $2.20 |
-| `zai-org/GLM-4.5-Air` | Text | $0.20 | $1.20 |
-| `moonshot-ai/Kimi-K2.5` | Text | $0.50 | $2.50 |
-| `moonshot-ai/Kimi-K2-Instruct` | Text | $0.50 | $2.40 |
-| `moonshot-ai/Kimi-K2-Thinking` | Reasoning | $0.60 | $2.50 |
-| `minimax/MiniMax-M2.5` | Text | $0.30 | $1.20 |
-| `minimax/MiniMax-M2.1` | Text | $0.30 | $1.20 |
-| `nvidia/Nemotron-3-Super-120b-a12b` | Text | $0.30 | $0.90 |
-| `nvidia/Llama-3_1-Nemotron-Ultra-253B-v1` | Text | $0.60 | $1.80 |
-| `nvidia/Nemotron-3-Nano-30B-A3B` | Text | $0.06 | $0.24 |
-| `nvidia/Nemotron-Nano-V2-12b` | Text | $0.07 | $0.20 |
-| `NousResearch/Hermes-4-405B` | Reasoning | $1.00 | $3.00 |
-| `NousResearch/Hermes-4-70B` | Reasoning | $0.13 | $0.40 |
-| `openai/gpt-oss-120b` | Reasoning | $0.15 | $0.60 |
-| `openai/gpt-oss-20b` | Reasoning | $0.05 | $0.20 |
-| `PrimeIntellect/INTELLECT-3` | Text | $0.20 | $1.10 |
-| `meta-llama/Llama-3.3-70B-Instruct` | Text | $0.13 | $0.40 |
-| `meta-llama/Meta-Llama-3.1-8B-Instruct` | Text | $0.02 | $0.06 |
-| `meta-llama/Meta-Llama-Guard-3-8B` | Safety | $0.02 | $0.06 |
-| `google/Gemma-3-27b-it` | Text | $0.10 | $0.30 |
-| `google/Gemma-2-9b-it` | Text | $0.03 | $0.09 |
-| `google/Gemma-2-2b-it` | Text | $0.02 | $0.06 |
-| `Qwen/Qwen3-Embedding-8B` | Embedding | $0.01 | — |
-| `BAAI/bge-multilingual-gemma2` | Embedding | $0.01 | — |
-| `BAAI/BGE-ICL` | Embedding | $0.01 | — |
-| `intfloat/e5-mistral-7b-instruct` | Embedding | $0.01 | — |
-| `black-forest-labs/FLUX.1-schnell` | Image | per image | — |
-| `black-forest-labs/FLUX.1-dev` | Image | per image | — |
+| `nebius/Qwen/Qwen3.5-397B-A17B` | Chat | $0.60 | $3.60 |
+| `nebius/Qwen/Qwen3-Coder-480B-A35B-Instruct` | Chat | $0.40 | $1.80 |
+| `nebius/Qwen/Qwen3-235B-A22B-Thinking-2507` | Reasoning | $0.20 | $0.80 |
+| `nebius/Qwen/Qwen3-235B-A22B-Instruct-2507` | Chat | $0.20 | $0.60 |
+| `nebius/Qwen/Qwen3-Next-80B-A3B-Thinking` | Reasoning | $0.15 | $1.20 |
+| `nebius/deepseek-ai/DeepSeek-V3.2` | Chat | $0.30 | $0.45 |
+| `nebius/deepseek-ai/DeepSeek-R1-0528` | Reasoning | $0.80 | $2.40 |
+| `nebius/zai-org/GLM-5` | Chat | $1.00 | $3.20 |
+| `nebius/openai/gpt-oss-120b` | Reasoning | $0.15 | $0.60 |
+| `nebius/NousResearch/Hermes-4-405B` | Reasoning | $1.00 | $3.00 |
+| ... and 28 more (see `index.ts` for full catalog) | | | |
 
-Reference models with the `nebius/` prefix, e.g. `nebius/Qwen/Qwen3.5-397B-A17B`.
+### Embedding (not chat-eligible)
+
+| Model | Input $/1M |
+|-------|-----------|
+| `nebius/Qwen/Qwen3-Embedding-8B` | $0.01 |
+| `nebius/BAAI/bge-multilingual-gemma2` | $0.01 |
+| `nebius/BAAI/BGE-ICL` | $0.01 |
+| `nebius/intfloat/e5-mistral-7b-instruct` | $0.01 |
+
+### Image Generation (not chat-eligible)
+
+| Model | Pricing |
+|-------|---------|
+| `nebius/black-forest-labs/FLUX.1-schnell` | per image |
+| `nebius/black-forest-labs/FLUX.1-dev` | per image |
+
+---
+
+## Development
+
+```bash
+npm install
+npm run check    # type-check without emitting
+npm run build    # compile to dist/
+npm test         # run vitest
+```
 
 ---
 
 ## Troubleshooting
 
 **"No API key found for provider nebius"**
-- Verify `auth-profiles.json` has the `nebius:default` entry
+- Verify `auth-profiles.json` has the `nebius:default` entry with `"type": "api_key"`, `"provider": "nebius"`, `"key": "..."`
 - Run `launchctl setenv NEBIUS_API_KEY "..."` and restart the gateway
+- Auth is resolved from profiles + env vars, NOT from plugin config
 
-**"Unknown model: ..."**
-- Use the fully qualified name: `nebius/org/model-name`
-- Run `openclaw models list` to see all registered models
+**"Unknown model: zai-org/GLM-5"**
+- You must use the fully qualified name: `nebius/zai-org/GLM-5`
+- Bare model IDs without the `nebius/` prefix will not resolve
 
 **Config validation errors**
 - Run `openclaw doctor --fix`
-
-**Gateway keeps overwriting `models.json`**
-- This is normal. The gateway manages `agents/main/agent/models.json` at runtime. The plugin's `index.ts` is the source of truth for the model catalog.
 
 ---
 
 ## Plugin Structure
 
 ```
-~/.openclaw/extensions/openclaw-nebius/
-  ├── package.json            # Plugin metadata + OpenClaw compat
-  ├── openclaw.plugin.json    # Manifest, auth config, configSchema
-  ├── index.ts                # Provider registration + full model catalog
-  ├── tsconfig.json           # TypeScript config
+openclaw-nebius/
+  ├── package.json            # Metadata, scripts, OpenClaw compat
+  ├── openclaw.plugin.json    # Manifest + auth config
+  ├── index.ts                # Provider registration + model catalog
+  ├── index.test.ts           # Vitest tests
+  ├── tsconfig.json           # TypeScript config (outputs to dist/)
+  ├── dist/                   # Compiled output (git-ignored)
   └── SETUP.md                # This file
 ```

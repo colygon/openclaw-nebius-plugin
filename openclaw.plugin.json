@@ -20,18 +20,7 @@
   ],
   "configSchema": {
     "type": "object",
-    "properties": {
-      "apiKey": {
-        "type": "string",
-        "description": "Nebius Token Factory API key"
-      }
-    },
-    "uiHints": {
-      "apiKey": {
-        "label": "API Key",
-        "sensitive": true,
-        "placeholder": "v1.Cm..."
-      }
-    }
+    "properties": {},
+    "additionalProperties": false
   }
 }
