@@ -3,8 +3,7 @@
   "version": "1.1.0",
   "type": "module",
   "description": "Nebius Token Factory provider plugin for OpenClaw — 44+ open-source models via a single endpoint",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./index.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "check": "tsc --noEmit",
@@ -13,12 +12,17 @@
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
+    "openclaw": "^2026.4.5",
     "typescript": "^5.5.0",
     "vitest": "^3.0.0"
   },
   "openclaw": {
-    "extensions": ["./dist/index.js"],
-    "providers": ["nebius"],
+    "extensions": [
+      "./index.ts"
+    ],
+    "providers": [
+      "nebius"
+    ],
     "compat": {
       "pluginApi": ">=2026.3.24-beta.2",
       "minGatewayVersion": "2026.3.24-beta.2"

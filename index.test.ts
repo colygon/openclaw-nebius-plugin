@@ -38,6 +38,14 @@ describe("nebius provider plugin", () => {
       }
     });
 
+    it("all input types are SDK-compatible (text or image only)", () => {
+      for (const m of NEBIUS_MODELS) {
+        for (const t of m.input) {
+          expect(["text", "image"]).toContain(t);
+        }
+      }
+    });
+
     it("model IDs follow org/name format", () => {
       for (const m of NEBIUS_MODELS) {
         expect(m.id).toMatch(
@@ -57,14 +65,11 @@ describe("nebius provider plugin", () => {
       }
     });
 
-    it("embedding models use input: ['embedding']", () => {
+    it("no embedding models in catalog (unsupported by SDK)", () => {
       const embeddings = NEBIUS_MODELS.filter((m) =>
         m.input.includes("embedding"),
       );
-      expect(embeddings.length).toBeGreaterThan(0);
-      for (const m of embeddings) {
-        expect(m.cost.output).toBe(0);
-      }
+      expect(embeddings.length).toBe(0);
     });
 
     it("image models use input: ['image']", () => {

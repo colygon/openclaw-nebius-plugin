@@ -84,14 +84,16 @@ const CHAT_MODELS: NebiusModel[] = [
   { id: "meta-llama/Meta-Llama-Guard-3-8B", name: "Llama Guard 3 8B", contextWindow: 32000, maxTokens: 4096, input: ["text"], cost: { input: 0.02, output: 0.06 }, reasoning: false },
 ];
 
-// ─── Embedding Models (not chat-eligible) ───────────────────────────────────
-
-const EMBEDDING_MODELS: NebiusModel[] = [
-  { id: "Qwen/Qwen3-Embedding-8B", name: "Qwen3 Embedding 8B", contextWindow: 32000, maxTokens: 4096, input: ["embedding"], cost: { input: 0.01, output: 0 }, reasoning: false },
-  { id: "BAAI/bge-multilingual-gemma2", name: "BGE Multilingual Gemma2", contextWindow: 32000, maxTokens: 4096, input: ["embedding"], cost: { input: 0.01, output: 0 }, reasoning: false },
-  { id: "BAAI/BGE-ICL", name: "BGE ICL", contextWindow: 32000, maxTokens: 4096, input: ["embedding"], cost: { input: 0.01, output: 0 }, reasoning: false },
-  { id: "intfloat/e5-mistral-7b-instruct", name: "E5 Mistral 7B", contextWindow: 32000, maxTokens: 4096, input: ["embedding"], cost: { input: 0.01, output: 0 }, reasoning: false },
-];
+// ─── Embedding Models ───────────────────────────────────────────────────────
+// Excluded from provider catalog: OpenClaw's ModelDefinitionConfig only allows
+// input: "text" | "image". Embedding models would need a separate registration
+// path (registerEmbeddingProvider) if/when the SDK supports it.
+//
+// Available on Nebius but not registered here:
+//   - Qwen/Qwen3-Embedding-8B
+//   - BAAI/bge-multilingual-gemma2
+//   - BAAI/BGE-ICL
+//   - intfloat/e5-mistral-7b-instruct
 
 // ─── Image Generation Models (not chat-eligible) ───────────────────────────
 
@@ -104,7 +106,6 @@ const IMAGE_MODELS: NebiusModel[] = [
 
 export const NEBIUS_MODELS: NebiusModel[] = [
   ...CHAT_MODELS,
-  ...EMBEDDING_MODELS,
   ...IMAGE_MODELS,
 ];
 
