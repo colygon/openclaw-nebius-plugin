@@ -1,9 +1,9 @@
 {
-  "name": "@colinlowenberg/openclaw-nebius",
-  "version": "1.1.0",
+  "name": "@colygon/openclaw-nebius",
+  "version": "1.1.1",
   "type": "module",
   "description": "Nebius Token Factory provider plugin for OpenClaw — 44+ open-source models via a single endpoint",
-  "main": "./index.ts",
+  "main": "./dist/index.js",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "check": "tsc --noEmit",
@@ -18,7 +18,7 @@
   },
   "openclaw": {
     "extensions": [
-      "./index.ts"
+      "./dist/index.js"
     ],
     "providers": [
       "nebius"
@@ -26,6 +26,9 @@
     "compat": {
       "pluginApi": ">=2026.3.24-beta.2",
       "minGatewayVersion": "2026.3.24-beta.2"
+    },
+    "build": {
+      "openclawVersion": "2026.4.5"
     }
   },
   "files": [
@@ -36,6 +39,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/colygon/openclaw-nebius.git"
+    "url": "https://github.com/colygon/openclaw-nebius-plugin.git"
   }
 }
