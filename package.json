@@ -1,0 +1,15 @@
+{
+  "name": "@colinlowenberg/openclaw-nebius",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Nebius Token Factory provider plugin for OpenClaw",
+  "main": "./index.ts",
+  "openclaw": {
+    "extensions": ["./index.ts"],
+    "providers": ["nebius"],
+    "compat": {
+      "pluginApi": ">=2026.3.24-beta.2",
+      "minGatewayVersion": "2026.3.24-beta.2"
+    }
+  }
+}
