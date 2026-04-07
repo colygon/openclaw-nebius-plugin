@@ -24,6 +24,8 @@ describe("nebius provider plugin", () => {
         expect(m.cost).toBeDefined();
         expect(typeof m.cost.input).toBe("number");
         expect(typeof m.cost.output).toBe("number");
+        expect(typeof m.cost.cacheRead).toBe("number");
+        expect(typeof m.cost.cacheWrite).toBe("number");
         expect(typeof m.reasoning).toBe("boolean");
       }
     });
