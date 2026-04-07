@@ -15,7 +15,7 @@ export interface NebiusModel {
   name: string;
   contextWindow: number;
   maxTokens: number;
-  input: string[];
+  input: ("text" | "image")[];
   cost: { input: number; output: number };
   reasoning: boolean;
 }
