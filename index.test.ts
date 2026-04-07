@@ -56,6 +56,27 @@ describe("nebius provider plugin", () => {
         );
       }
     });
+
+    it("maxTokens is not blanket-hardcoded to 4096 for chat models", () => {
+      const chat = NEBIUS_MODELS.filter((m) => m.input.includes("text"));
+      const maxTokensValues = new Set(chat.map((m) => m.maxTokens));
+      expect(maxTokensValues.size).toBeGreaterThan(1);
+    });
+
+    it("contextWindow is not blanket-hardcoded to 32000 for chat models", () => {
+      const chat = NEBIUS_MODELS.filter((m) => m.input.includes("text"));
+      const contextValues = new Set(chat.map((m) => m.contextWindow));
+      expect(contextValues.size).toBeGreaterThan(1);
+    });
+
+    it("maxTokens does not exceed contextWindow for any model", () => {
+      for (const m of NEBIUS_MODELS) {
+        expect(m.maxTokens).toBeLessThanOrEqual(
+          m.contextWindow,
+          `Model "${m.id}": maxTokens (${m.maxTokens}) exceeds contextWindow (${m.contextWindow})`,
+        );
+      }
+    });
   });
 
   describe("model types", () => {

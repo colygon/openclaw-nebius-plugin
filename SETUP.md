@@ -117,14 +117,11 @@ openclaw gateway restart
 | `nebius/NousResearch/Hermes-4-405B` | Reasoning | $1.00 | $3.00 |
 | ... and 28 more (see `index.ts` for full catalog) | | | |
 
-### Embedding (not chat-eligible)
+### Embedding
 
-| Model | Input $/1M |
-|-------|-----------|
-| `nebius/Qwen/Qwen3-Embedding-8B` | $0.01 |
-| `nebius/BAAI/bge-multilingual-gemma2` | $0.01 |
-| `nebius/BAAI/BGE-ICL` | $0.01 |
-| `nebius/intfloat/e5-mistral-7b-instruct` | $0.01 |
+> **Not registered in this plugin.** The OpenClaw SDK does not yet support
+> embedding-only models. Nebius offers embedding models (Qwen3-Embedding-8B,
+> BGE-ICL, etc.) — use them directly via the Nebius API, not through OpenClaw.
 
 ### Image Generation (not chat-eligible)
 
