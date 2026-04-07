@@ -77,7 +77,7 @@ Under `plugins.installs`:
 "nebius": {
   "source": "path",
   "installPath": "/path/to/openclaw-nebius",
-  "version": "1.1.0"
+  "version": "1.2.0"
 }
 ```
 

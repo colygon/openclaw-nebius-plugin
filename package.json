@@ -1,6 +1,6 @@
 {
   "name": "@colygon/openclaw-nebius",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "type": "module",
   "description": "Nebius Token Factory provider plugin for OpenClaw — 44+ open-source models via a single endpoint",
   "main": "./dist/index.js",
@@ -34,7 +34,8 @@
   "files": [
     "dist",
     "openclaw.plugin.json",
-    "SETUP.md"
+    "SETUP.md",
+    "SKILL.md"
   ],
   "license": "MIT",
   "repository": {
