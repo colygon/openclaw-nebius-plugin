@@ -1,5 +1,4 @@
-import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
-import { createProviderApiKeyAuthMethod } from "openclaw/plugin-sdk/provider-auth";
+import { defineSingleProviderPluginEntry } from "openclaw/plugin-sdk/provider-entry";
 
 /**
  * Model type tags used in the `input` array to distinguish capabilities.
@@ -119,45 +118,36 @@ export const PROVIDER_ID = "nebius";
 export const BASE_URL = "https://api.tokenfactory.us-central1.nebius.com/v1";
 
 // ─── Plugin entry ───────────────────────────────────────────────────────────
+// Uses defineSingleProviderPluginEntry (same pattern as built-in DeepSeek,
+// OpenAI, etc.) so the gateway handles auth resolution + catalog registration.
 
-export default definePluginEntry({
+function buildNebiusProvider() {
+  return {
+    baseUrl: BASE_URL,
+    api: "openai-completions" as const,
+    models: NEBIUS_MODELS,
+  };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const plugin: any = defineSingleProviderPluginEntry({
   id: PROVIDER_ID,
   name: "Nebius Token Factory",
   description:
     "Nebius Token Factory model provider — 44+ open-source models via a single OpenAI-compatible endpoint",
-  register(api) {
-    api.registerProvider({
-      id: PROVIDER_ID,
-      label: "Nebius Token Factory",
-      docsPath: "/providers/nebius",
-      envVars: ["NEBIUS_API_KEY"],
-      auth: [
-        createProviderApiKeyAuthMethod({
-          providerId: PROVIDER_ID,
-          methodId: "api-key",
-          label: "Nebius Token Factory API key",
-          optionKey: "nebiusApiKey",
-          flagName: "--nebius-api-key",
-          envVar: "NEBIUS_API_KEY",
-          promptMessage: "Enter your Nebius Token Factory API key",
-          defaultModel: `${PROVIDER_ID}/Qwen/Qwen3.5-397B-A17B`,
-        }),
-      ],
-      catalog: {
-        order: "simple",
-        run: async (ctx) => {
-          const { apiKey } = ctx.resolveProviderApiKey(PROVIDER_ID);
-          if (!apiKey) return null;
-          return {
-            provider: {
-              baseUrl: BASE_URL,
-              apiKey,
-              api: "openai-completions",
-              models: NEBIUS_MODELS,
-            },
-          };
-        },
-      },
-    });
+  provider: {
+    label: "Nebius Token Factory",
+    docsPath: "/providers/nebius",
+    auth: [{
+      methodId: "api-key",
+      label: "Nebius Token Factory API key",
+      optionKey: "nebiusApiKey",
+      flagName: "--nebius-api-key",
+      envVar: "NEBIUS_API_KEY",
+      promptMessage: "Enter your Nebius Token Factory API key",
+      defaultModel: `${PROVIDER_ID}/Qwen/Qwen3.5-397B-A17B`,
+    }],
+    catalog: { buildProvider: buildNebiusProvider },
   },
 });
+export default plugin;
