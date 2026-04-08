@@ -1,6 +1,6 @@
 {
   "name": "@colygon/openclaw-nebius",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "type": "module",
   "description": "Nebius Token Factory provider plugin for OpenClaw — 44+ open-source models via a single endpoint",
   "main": "./dist/index.js",
