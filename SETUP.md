@@ -17,6 +17,10 @@ A provider plugin that gives OpenClaw access to 44+ open-source models via Nebiu
 
 ---
 
+## Deploying OpenClaw on Nebius
+
+To deploy OpenClaw as a serverless endpoint on Nebius AI Cloud, use the [nebius skill](https://github.com/colygon/nebius-skill). It handles endpoint creation, region/platform selection, networking, SSH access, and dashboard setup.
+
 ## Prerequisites
 
 - OpenClaw `>= 2026.3.24`

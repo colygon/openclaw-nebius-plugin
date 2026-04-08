@@ -100,6 +100,10 @@ openclaw config set agents.defaults.model.primary "nebius/deepseek-ai/DeepSeek-V
 openclaw gateway restart
 ```
 
+## Deploying OpenClaw on Nebius
+
+To deploy OpenClaw as a serverless endpoint on Nebius AI Cloud, use the [nebius skill](https://github.com/colygon/nebius-skill). It covers the full deployment workflow — creating endpoints, configuring regions, setting up networking, and connecting via TUI or dashboard.
+
 ## Required Credentials
 
 | Variable | Required | Description |
