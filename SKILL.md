@@ -14,41 +14,132 @@ env:
 
 Adds 44+ open-source models to OpenClaw via the Nebius Token Factory inference API.
 
+## Installation
+
+Run this single command to install the plugin from ClawhHub:
+
+```bash
+openclaw plugins install clawhub:@colygon/openclaw-nebius
+```
+
+Then configure the API key and restart the gateway. Full steps below.
+
+## Step-by-Step Setup
+
+### Step 1: Install the plugin
+
+```bash
+openclaw plugins install clawhub:@colygon/openclaw-nebius
+```
+
+If reinstalling, remove the old version first:
+
+```bash
+rm -rf ~/.openclaw/extensions/nebius
+openclaw plugins install clawhub:@colygon/openclaw-nebius
+```
+
+### Step 2: Get an API key
+
+Sign up or log in at https://studio.nebius.ai/ and create an API key.
+
+### Step 3: Set the API key
+
+The gateway runs as a macOS LaunchAgent. Shell env vars from .zshrc are NOT visible to it. Use launchctl:
+
+```bash
+launchctl setenv NEBIUS_API_KEY "v1.YOUR_KEY_HERE"
+```
+
+Also create the auth profile for the agent. Add this file at `~/.openclaw/agents/main/agent/auth-profiles.json`:
+
+```json
+{
+  "profiles": {
+    "nebius:default": {
+      "type": "api_key",
+      "provider": "nebius",
+      "key": "v1.YOUR_KEY_HERE"
+    }
+  },
+  "lastGood": {
+    "nebius": "nebius:default"
+  }
+}
+```
+
+If `auth-profiles.json` already exists, merge the `nebius:default` entry into the existing `profiles` object and add `"nebius": "nebius:default"` to the existing `lastGood` object.
+
+### Step 4: Add nebius to the plugins allowlist
+
+```bash
+openclaw config set plugins.allow '["nebius"]'
+```
+
+If other plugins are already in the allowlist, include them too (e.g. `'["nebius", "openclaw-mem0"]'`).
+
+### Step 5: Restart the gateway
+
+```bash
+openclaw gateway restart
+```
+
+### Step 6: Verify
+
+```bash
+openclaw plugins inspect nebius
+openclaw models list --provider nebius
+```
+
+You should see `Status: loaded` and at least one model listed.
+
+### Step 7 (optional): Set a Nebius model as default
+
+```bash
+openclaw config set agents.defaults.model.primary "nebius/deepseek-ai/DeepSeek-V3.2"
+openclaw gateway restart
+```
+
 ## Required Credentials
 
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `NEBIUS_API_KEY` | Yes | API key from [studio.nebius.ai](https://studio.nebius.ai/) |
 
-## Setup
+No other credentials are needed. The plugin only communicates with `https://api.tokenfactory.us-central1.nebius.com/v1`.
 
-1. **Get an API key** from [studio.nebius.ai](https://studio.nebius.ai/)
+## Available Models
 
-2. **Set the API key** via auth profile or environment variable:
+All models use the `nebius/` prefix. Examples:
 
-   ```bash
-   # Option A: LaunchAgent env var (required for gateway)
-   launchctl setenv NEBIUS_API_KEY "v1.YOUR_KEY_HERE"
+- `nebius/deepseek-ai/DeepSeek-V3.2` — DeepSeek V3.2 (163K context, chat)
+- `nebius/Qwen/Qwen3-235B-A22B-Thinking-2507` — Qwen3 235B (reasoning)
+- `nebius/Qwen/Qwen3-Coder-480B-A35B-Instruct` — Qwen3 Coder 480B
+- `nebius/moonshot-ai/Kimi-K2.5` — Kimi K2.5 (262K context)
+- `nebius/meta-llama/Llama-3.3-70B-Instruct` — Llama 3.3 70B
+- `nebius/google/Gemma-3-27b-it` — Gemma 3 27B
+- `nebius/NousResearch/Hermes-4-405B` — Hermes 4 405B (reasoning)
+- `nebius/openai/gpt-oss-120b` — GPT-OSS 120B (reasoning)
 
-   # Option B: Auth profile (required for agent)
-   # Add to ~/.openclaw/agents/main/agent/auth-profiles.json
-   ```
+38 chat/reasoning models and 2 image generation models (FLUX.1) are included.
 
-3. **Enable the plugin** in `~/.openclaw/openclaw.json`
+See the full catalog in [SETUP.md](https://github.com/colygon/openclaw-nebius-plugin/blob/main/SETUP.md).
 
-4. **Restart the gateway:**
-   ```bash
-   openclaw gateway restart
-   ```
+## Troubleshooting
 
-## Supported Models
+**"plugin not found: nebius"**
+- Run `openclaw plugins install clawhub:@colygon/openclaw-nebius`
+- If reinstalling: `rm -rf ~/.openclaw/extensions/nebius` first
 
-Chat and reasoning models from: Qwen (3.5, 3, 2.5), DeepSeek (V3.2, R1),
-Kimi (K2.5, K2), GLM (5, 4.7, 4.5), NVIDIA Nemotron, Meta Llama, Google Gemma,
-NousResearch Hermes, OpenAI GPT-OSS, MiniMax, and PrimeIntellect.
+**401 Unauthorized**
+- API key expired or wrong. Generate a fresh one at studio.nebius.ai
+- Make sure you ran `launchctl setenv NEBIUS_API_KEY "..."` (not just `export`)
+- Restart the gateway after changing the key
 
-Image generation: FLUX.1 Schnell and FLUX.1 Dev.
+**"Unknown model: nebius/..."**
+- Run `openclaw gateway restart` after installing
+- Check `openclaw plugins inspect nebius` shows `Status: loaded`
 
-All models use the `nebius/` prefix (e.g., `nebius/deepseek-ai/DeepSeek-V3.2`).
-
-See [SETUP.md](https://github.com/colygon/openclaw-nebius-plugin/blob/main/SETUP.md) for the full model catalog and detailed configuration.
+**Models show as "missing"**
+- The plugin catalog auth may not resolve. Add models to config directly:
+  See SETUP.md section on config-based model registration.
