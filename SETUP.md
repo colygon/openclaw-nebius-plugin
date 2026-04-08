@@ -101,23 +101,27 @@ AUTHEOF
 
 ## Step 5: Enable the plugin
 
-Check the current allowlist and preserve any existing entries:
+**This step is critical — do not blindly overwrite the allowlist.** `plugins.allow` controls both third-party plugins AND built-in CLI commands like `restart`. Overwriting it will break existing functionality.
+
+First, read the current allowlist:
 
 ```bash
 openclaw config get plugins.allow 2>/dev/null
 ```
 
-If other plugins are already allowed (e.g., `["openclaw-mem0"]`), include them alongside nebius:
+Then add `"nebius"` to whatever is already there. For example, if the current value is `["restart", "openclaw-mem0"]`:
 
 ```bash
-openclaw config set plugins.allow '["nebius", "openclaw-mem0"]'
+openclaw config set plugins.allow '["restart", "openclaw-mem0", "nebius"]'
 ```
 
-If no other plugins are configured:
+If the allowlist is empty or not set:
 
 ```bash
 openclaw config set plugins.allow '["nebius"]'
 ```
+
+Never remove entries you don't recognize — they may be bundled plugins the user depends on.
 
 ## Step 6: Restart the gateway
 
